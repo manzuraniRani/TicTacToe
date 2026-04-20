@@ -3,14 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>אקס עיגול</title>
+<title>אקס עיגול מקוון</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: Arial, sans-serif; background: #f0edf8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
   #app { width: 100%; max-width: 460px; }
-
-  .screen-title { font-size: 26px; font-weight: bold; text-align: center; color: #26215C; margin-bottom: 0.25rem; }
-  .screen-sub { font-size: 14px; text-align: center; color: #888780; margin-bottom: 1.5rem; }
 
   .draw-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 1rem; padding-top: 1rem; }
   .dot { width: 9px; height: 9px; border-radius: 50%; }
@@ -18,17 +15,35 @@
   .dot-sep { background: #ccc; }
   .dot-o { background: #0F6E56; }
 
-  .login-card { background: #fff; border: 1px solid #ddd; border-radius: 16px; padding: 1.75rem; }
+  .screen-title { font-size: 26px; font-weight: bold; text-align: center; color: #26215C; margin-bottom: 0.25rem; }
+  .screen-sub { font-size: 14px; text-align: center; color: #888780; margin-bottom: 1.5rem; }
+
+  .card { background: #fff; border: 1px solid #ddd; border-radius: 16px; padding: 1.75rem; }
   .field { margin-bottom: 1rem; }
-  label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; }
-  .label-x { color: #534AB7; }
-  .label-o { color: #0F6E56; }
+  label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; color: #534AB7; }
   input[type="text"] { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 8px; outline: none; font-family: Arial, sans-serif; direction: rtl; }
   input[type="text"]:focus { border-color: #534AB7; box-shadow: 0 0 0 3px #EEEDFE; }
   .err { font-size: 13px; color: #c0392b; min-height: 18px; margin-top: 6px; }
-  .btn-start { width: 100%; margin-top: 0.75rem; padding: 13px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 10px; border: none; background: #534AB7; color: #EEEDFE; font-family: Arial, sans-serif; }
-  .btn-start:hover { background: #3C3489; }
-  .saved-badge { font-size: 12px; background: #E1F5EE; color: #085041; border-radius: 8px; padding: 8px 12px; margin-bottom: 1rem; text-align: center; border: 1px solid #5DCAA5; }
+
+  .btn { width: 100%; padding: 13px; font-size: 15px; font-weight: bold; cursor: pointer; border-radius: 10px; border: none; font-family: Arial, sans-serif; margin-top: 0.5rem; }
+  .btn-primary { background: #534AB7; color: #EEEDFE; }
+  .btn-primary:hover { background: #3C3489; }
+  .btn-secondary { background: #E1F5EE; color: #085041; border: 1px solid #5DCAA5; }
+  .btn-secondary:hover { background: #9FE1CB; }
+  .btn-gray { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
+  .btn-gray:hover { background: #e8e8e8; }
+
+  .divider { text-align: center; font-size: 13px; color: #aaa; margin: 1rem 0; }
+
+  .room-code-box { background: #EEEDFE; border: 2px dashed #AFA9EC; border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1rem; }
+  .room-code-label { font-size: 12px; color: #534AB7; margin-bottom: 6px; }
+  .room-code { font-size: 40px; font-weight: bold; color: #26215C; letter-spacing: 10px; }
+  .room-code-hint { font-size: 12px; color: #888; margin-top: 6px; }
+
+  .waiting-box { background: #FAEEDA; border-radius: 12px; padding: 1rem; text-align: center; margin-bottom: 1rem; }
+  .waiting-text { font-size: 14px; color: #633806; }
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid #BA7517; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 6px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
   .pcard { border-radius: 12px; padding: 14px 12px; text-align: center; border: 2px solid transparent; transition: border-color 0.15s; }
@@ -45,294 +60,283 @@
   .pcard-score { font-size: 12px; margin-top: 4px; }
   .pcard-x .pcard-score { color: #534AB7; }
   .pcard-o .pcard-score { color: #0F6E56; }
+  .you-badge { font-size: 10px; border-radius: 10px; padding: 2px 8px; margin-top: 4px; display: inline-block; }
+  .you-badge-x { background: #534AB7; color: #EEEDFE; }
+  .you-badge-o { background: #0F6E56; color: #E1F5EE; }
 
   .status-bar { text-align: center; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 8px; margin-bottom: 1rem; min-height: 40px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #333; }
   .status-win-x { background: #EEEDFE; color: #3C3489; }
   .status-win-o { background: #E1F5EE; color: #085041; }
   .status-draw { background: #FAEEDA; color: #633806; }
-  .status-turn-x { color: #534AB7; background: #f5f5f5; }
-  .status-turn-o { color: #0F6E56; background: #f5f5f5; }
+  .status-turn-x { color: #534AB7; }
+  .status-turn-o { color: #0F6E56; }
+  .status-wait { color: #888; }
 
   .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
   .cell { aspect-ratio: 1; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 44px; font-weight: bold; cursor: pointer; border: 2px solid #e0e0e0; background: #fff; transition: background 0.1s, border-color 0.1s; user-select: none; }
-  .cell:hover:not(.taken) { background: #f0edf8; border-color: #AFA9EC; }
+  .cell:hover:not(.taken):not(.disabled) { background: #f0edf8; border-color: #AFA9EC; }
   .cell.x { background: #EEEDFE; border-color: #AFA9EC; color: #3C3489; cursor: default; }
   .cell.o { background: #E1F5EE; border-color: #5DCAA5; color: #085041; cursor: default; }
   .cell.win { background: #FAC775; border-color: #BA7517; color: #412402; }
+  .cell.disabled { cursor: default; }
 
   .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
-  .btn { padding: 11px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family: Arial, sans-serif; }
-  .btn-new { background: #EEEDFE; color: #3C3489; border: 1px solid #AFA9EC; }
-  .btn-new:hover { background: #CECBF6; }
-  .btn-exit { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
-  .btn-exit:hover { background: #e8e8e8; }
+  .btn-sm { padding: 11px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family: Arial, sans-serif; border: none; }
+  .btn-rematch { background: #EEEDFE; color: #3C3489; border: 1px solid #AFA9EC; }
+  .btn-rematch:hover { background: #CECBF6; }
+  .btn-rematch:disabled { opacity: 0.6; cursor: default; }
 
-  .save-indicator { font-size: 11px; text-align: center; padding: 5px 10px; border-radius: 6px; margin-bottom: 0.75rem; }
-  .save-ok { background: #E1F5EE; color: #085041; }
-  .save-err { background: #fdecea; color: #c0392b; }
-
-  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
-  .stat-box { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 10px; text-align: center; }
-  .stat-num { font-size: 22px; font-weight: bold; }
-  .stat-num-x { color: #534AB7; }
-  .stat-num-o { color: #0F6E56; }
-  .stat-num-d { color: #BA7517; }
-  .stat-lbl { font-size: 11px; color: #aaa; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-  .history-wrap { border-top: 1px solid #e0e0e0; padding-top: 1rem; margin-bottom: 1rem; }
-  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .history-title { font-size: 13px; font-weight: bold; color: #888; }
-  .btn-clear { font-size: 11px; background: none; border: 1px solid #e0b0b0; color: #c0392b; cursor: pointer; font-family: Arial, sans-serif; padding: 3px 8px; border-radius: 6px; }
-  .btn-clear:hover { background: #fdecea; }
-  .hist-list { max-height: 360px; overflow-y: auto; border-radius: 8px; }
-  .h-row { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 8px; font-size: 13px; padding: 7px 8px; border-radius: 6px; margin-bottom: 3px; }
-  .h-row:nth-child(odd) { background: #f9f9f9; }
-  .h-num { color: #bbb; font-size: 11px; text-align: center; }
-  .h-date { font-size: 11px; color: #bbb; }
-  .badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-  .badge-x { background: #EEEDFE; color: #3C3489; }
-  .badge-o { background: #E1F5EE; color: #085041; }
-  .badge-d { background: #FAEEDA; color: #633806; }
+  .disc-box { background: #fdecea; border-radius: 10px; padding: 10px; text-align: center; font-size: 13px; color: #c0392b; margin-bottom: 1rem; }
 </style>
 </head>
 <body>
 <div id="app">
 
-<div id="screen-login">
-  <div class="draw-dots">
-    <div class="dot dot-x"></div><div class="dot dot-x"></div>
-    <div class="dot dot-sep"></div>
-    <div class="dot dot-o"></div><div class="dot dot-o"></div>
-  </div>
-  <div class="screen-title">אקס עיגול</div>
-  <div class="screen-sub">הכנס שמות כדי להתחיל</div>
-  <div class="login-card">
-    <div id="saved-hint" style="display:none" class="saved-badge"></div>
-    <div class="field">
-      <label class="label-x">שחקן 1 — ✕</label>
-      <input type="text" id="p1" placeholder="שם שחקן..." maxlength="18" />
+  <div id="screen-lobby">
+    <div class="draw-dots">
+      <div class="dot dot-x"></div><div class="dot dot-x"></div>
+      <div class="dot dot-sep"></div>
+      <div class="dot dot-o"></div><div class="dot dot-o"></div>
     </div>
-    <div class="field">
-      <label class="label-o">שחקן 2 — ○</label>
-      <input type="text" id="p2" placeholder="שם שחקן..." maxlength="18" />
+    <div class="screen-title">אקס עיגול מקוון</div>
+    <div class="screen-sub">שחק מול חבר ממחשב אחר</div>
+    <div class="card">
+      <div class="field">
+        <label>השם שלך</label>
+        <input type="text" id="input-name" placeholder="הכנס שם..." maxlength="18" />
+      </div>
+      <button class="btn btn-primary" id="btn-create">צור חדר חדש</button>
+      <div class="divider">— או —</div>
+      <div class="field">
+        <label style="color:#0F6E56">הצטרף לחדר קיים</label>
+        <input type="text" id="input-code" placeholder="קוד בן 4 ספרות" maxlength="4" style="letter-spacing:6px;font-size:20px;text-align:center;" />
+      </div>
+      <button class="btn btn-secondary" id="btn-join">הצטרף</button>
+      <div class="err" id="err-lobby"></div>
     </div>
-    <div class="err" id="err"></div>
-    <button class="btn-start" onclick="startGame()">בוא נשחק</button>
   </div>
+
+  <div id="screen-waiting" style="display:none">
+    <div class="draw-dots">
+      <div class="dot dot-x"></div><div class="dot dot-x"></div>
+      <div class="dot dot-sep"></div>
+      <div class="dot dot-o"></div><div class="dot dot-o"></div>
+    </div>
+    <div class="screen-title">ממתין לחבר</div>
+    <div class="screen-sub">שלח את הקוד לחבר שלך</div>
+    <div class="room-code-box">
+      <div class="room-code-label">קוד החדר שלך</div>
+      <div class="room-code" id="display-code"></div>
+      <div class="room-code-hint">הכנס את הקוד אצל החבר כדי להצטרף</div>
+    </div>
+    <div class="waiting-box">
+      <span class="spinner"></span>
+      <span class="waiting-text">ממתין לחבר להתחבר...</span>
+    </div>
+    <button class="btn btn-gray" id="btn-cancel">ביטול</button>
+  </div>
+
+  <div id="screen-game" style="display:none; padding-top:1rem">
+    <div id="disc-box" style="display:none" class="disc-box">החבר שלך התנתק</div>
+    <div class="players-grid">
+      <div class="pcard pcard-x" id="cx">
+        <div class="pcard-name" id="nx">שחקן 1</div>
+        <div class="pcard-sym sym-x">✕</div>
+        <div class="pcard-score" id="sx">0 נצחונות</div>
+        <div id="you-x" style="display:none" class="you-badge you-badge-x">אתה</div>
+      </div>
+      <div class="pcard pcard-o" id="co">
+        <div class="pcard-name" id="no">שחקן 2</div>
+        <div class="pcard-sym sym-o">○</div>
+        <div class="pcard-score" id="so">0 נצחונות</div>
+        <div id="you-o" style="display:none" class="you-badge you-badge-o">אתה</div>
+      </div>
+    </div>
+    <div class="status-bar" id="status">טוען...</div>
+    <div class="board" id="board"></div>
+    <div class="btn-row">
+      <button class="btn-sm btn-rematch" id="btn-rematch" style="display:none" id="btn-rematch">משחק חוזר</button>
+      <button class="btn-sm btn-gray" id="btn-leave">יציאה</button>
+    </div>
+  </div>
+
 </div>
 
-<div id="screen-game" style="display:none; padding-top:1rem">
-  <div class="players-grid">
-    <div class="pcard pcard-x" id="cx">
-      <div class="pcard-name" id="nx"></div>
-      <div class="pcard-sym sym-x">✕</div>
-      <div class="pcard-score" id="sx">0 נצחונות</div>
-    </div>
-    <div class="pcard pcard-o" id="co">
-      <div class="pcard-name" id="no"></div>
-      <div class="pcard-sym sym-o">○</div>
-      <div class="pcard-score" id="so">0 נצחונות</div>
-    </div>
-  </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, update, onValue, remove, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  <div class="stats-row">
-    <div class="stat-box">
-      <div class="stat-num stat-num-x" id="total-x">0</div>
-      <div class="stat-lbl" id="lbl-x">נצחונות</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num stat-num-d" id="total-d">0</div>
-      <div class="stat-lbl">תיקו</div>
-    </div>
-    <div class="stat-box">
-      <div class="stat-num stat-num-o" id="total-o">0</div>
-      <div class="stat-lbl" id="lbl-o">נצחונות</div>
-    </div>
-  </div>
+const cfg = {
+  apiKey: "AIzaSyC1-3YgzB9x-XBqvQg1HD7B-WUxeUagf7U",
+  authDomain: "tictactoe-d5971.firebaseapp.com",
+  databaseURL: "https://tictactoe-d5971-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "tictactoe-d5971",
+  storageBucket: "tictactoe-d5971.firebasestorage.app",
+  messagingSenderId: "545266842758",
+  appId: "1:545266842758:web:1f0aa7c8c930eb428fa507"
+};
 
-  <div class="status-bar" id="status"></div>
-  <div class="board" id="board"></div>
-  <div class="btn-row">
-    <button class="btn btn-new" onclick="resetBoard()">משחק חדש</button>
-    <button class="btn btn-exit" onclick="logout()">יציאה</button>
-  </div>
+const db = getDatabase(initializeApp(cfg));
+const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-  <div id="save-ind" style="display:none"></div>
+let myName='', myRole='', roomCode='', unsub=null;
 
-  <div class="history-wrap">
-    <div class="history-header">
-      <div class="history-title">היסטוריית משחקים (עד 20 אחרונים)</div>
-      <button class="btn-clear" onclick="clearHistory()">נקה הכל</button>
-    </div>
-    <div class="hist-list" id="hist"></div>
-  </div>
-</div>
+function showScreen(id) {
+  ['screen-lobby','screen-waiting','screen-game'].forEach(s =>
+    document.getElementById(s).style.display = s===id ? '' : 'none');
+}
 
-</div>
-<script>
-  var KEY = 'tictactoe_v1';
-  var MAX = 20;
-  var P = { X: '', O: '' };
-  var SC = { X: 0, O: 0, D: 0 };
-  var board = Array(9).fill('');
-  var cur = 'X', over = false, hist = [];
-  var WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function randCode() { return String(Math.floor(1000+Math.random()*9000)); }
 
-  function load() {
-    try { var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }
-    catch(e) { return null; }
-  }
+async function createRoom() {
+  const name = document.getElementById('input-name').value.trim();
+  const err = document.getElementById('err-lobby');
+  if (!name) { err.textContent='יש להזין שם'; return; }
+  err.textContent='';
+  myName=name; myRole='X'; roomCode=randCode();
+  await set(ref(db,'rooms/'+roomCode), {
+    playerX:name, playerO:'',
+    board:Array(9).fill(''), turn:'X',
+    status:'waiting', scores:{X:0,O:0},
+    rematchX:false, rematchO:false,
+    ts: Date.now()
+  });
+  document.getElementById('display-code').textContent=roomCode;
+  showScreen('screen-waiting');
+  startListening();
+}
 
-  function save() {
-    var ind = document.getElementById('save-ind');
-    try {
-      localStorage.setItem(KEY, JSON.stringify({ P: P, SC: SC, hist: hist }));
-      ind.className = 'save-indicator save-ok';
-      ind.textContent = 'נשמר';
-      ind.style.display = 'block';
-      setTimeout(function(){ ind.style.display = 'none'; }, 1500);
-    } catch(e) {
-      ind.className = 'save-indicator save-err';
-      ind.textContent = 'שגיאה בשמירה — ' + e.message;
-      ind.style.display = 'block';
+async function joinRoom() {
+  const name = document.getElementById('input-name').value.trim();
+  const code = document.getElementById('input-code').value.trim();
+  const err = document.getElementById('err-lobby');
+  if (!name) { err.textContent='יש להזין שם'; return; }
+  if (!/^\d{4}$/.test(code)) { err.textContent='קוד חייב להיות 4 ספרות'; return; }
+  err.textContent='';
+  const snap = await get(ref(db,'rooms/'+code));
+  if (!snap.exists()) { err.textContent='חדר לא נמצא — בדוק את הקוד'; return; }
+  const d = snap.val();
+  if (d.playerO) { err.textContent='החדר כבר מלא'; return; }
+  myName=name; myRole='O'; roomCode=code;
+  await update(ref(db,'rooms/'+code), {playerO:name, status:'playing'});
+  showScreen('screen-game');
+  startListening();
+}
+
+function startListening() {
+  if (unsub) unsub();
+  unsub = onValue(ref(db,'rooms/'+roomCode), snap => {
+    if (!snap.exists()) { doLeave(false); return; }
+    const d = snap.val();
+    if (myRole==='X' && d.status==='waiting') { showScreen('screen-waiting'); return; }
+    if (d.status==='playing' || d.status==='done') {
+      showScreen('screen-game');
+      renderGame(d);
     }
-  }
+  });
+}
 
-  function checkSaved() {
-    var d = load();
-    var hint = document.getElementById('saved-hint');
-    if (d && d.P && d.P.X && d.P.O) {
-      hint.style.display = 'block';
-      hint.textContent = 'נמצא משחק שמור: ' + d.P.X + ' מול ' + d.P.O;
-      document.getElementById('p1').value = d.P.X;
-      document.getElementById('p2').value = d.P.O;
+function renderGame(d) {
+  document.getElementById('nx').textContent = d.playerX||'שחקן 1';
+  document.getElementById('no').textContent = d.playerO||'שחקן 2';
+  document.getElementById('you-x').style.display = myRole==='X'?'inline-block':'none';
+  document.getElementById('you-o').style.display = myRole==='O'?'inline-block':'none';
+  document.getElementById('sx').textContent = (d.scores?.X||0)+' נצחונות';
+  document.getElementById('so').textContent = (d.scores?.O||0)+' נצחונות';
+  document.getElementById('disc-box').style.display =
+    (d.status==='playing' && !d.playerO) ? 'block' : 'none';
+
+  const myTurn = d.turn===myRole && d.status==='playing';
+  const el = document.getElementById('board'); el.innerHTML='';
+  (d.board||Array(9).fill('')).forEach((v,i)=>{
+    const c=document.createElement('div');
+    let cls='cell';
+    if (v) { cls+=' taken '+v.toLowerCase(); if(d.winLine&&d.winLine.includes(i)) cls+=' win'; }
+    else if (!myTurn) cls+=' disabled';
+    c.className=cls;
+    c.textContent=v==='X'?'✕':v==='O'?'○':'';
+    if (!v && myTurn) c.onclick=()=>makeMove(i,d);
+    el.appendChild(c);
+  });
+
+  const st = document.getElementById('status');
+  st.className='status-bar';
+  if (d.status==='playing') {
+    if (d.turn===myRole) {
+      st.textContent='התור שלך!';
+      st.classList.add(myRole==='X'?'status-turn-x':'status-turn-o');
     } else {
-      hint.style.display = 'none';
+      const other = myRole==='X'?d.playerO:d.playerX;
+      st.textContent='ממתין ל'+other+'...';
+      st.classList.add('status-wait');
     }
+  } else if (d.status==='done') {
+    if (d.winner==='draw') { st.textContent='תיקו!'; st.classList.add('status-draw'); }
+    else if (d.winner===myRole) { st.textContent='ניצחת! 🎉'; st.classList.add(myRole==='X'?'status-win-x':'status-win-o'); }
+    else { st.textContent=(myRole==='X'?d.playerO:d.playerX)+' ניצח'; st.classList.add(d.winner==='X'?'status-win-x':'status-win-o'); }
   }
 
-  function startGame() {
-    var a = document.getElementById('p1').value.trim();
-    var b = document.getElementById('p2').value.trim();
-    var e = document.getElementById('err');
-    if (!a || !b) { e.textContent = 'יש להזין שמות לשני השחקנים'; return; }
-    if (a === b) { e.textContent = 'השמות חייבים להיות שונים'; return; }
+  const cx=document.getElementById('cx'), co=document.getElementById('co');
+  cx.className='pcard pcard-x'+(d.status==='playing'&&d.turn==='X'?' active':'');
+  co.className='pcard pcard-o'+(d.status==='playing'&&d.turn==='O'?' active':'');
 
-    var d = load();
-    if (d && d.P && d.P.X === a && d.P.O === b) {
-      SC = d.SC || { X:0, O:0, D:0 };
-      hist = d.hist || [];
-    } else {
-      SC = { X:0, O:0, D:0 };
-      hist = [];
-    }
-
-    P.X = a; P.O = b;
-    document.getElementById('screen-login').style.display = 'none';
-    document.getElementById('screen-game').style.display = '';
-    document.getElementById('nx').textContent = a;
-    document.getElementById('no').textContent = b;
-    document.getElementById('lbl-x').textContent = a;
-    document.getElementById('lbl-o').textContent = b;
-    updateScores(); renderHist(); resetBoard();
-  }
-
-  function resetBoard() {
-    board = Array(9).fill(''); cur = 'X'; over = false;
-    render(); setStatus('turn'); updateCards();
-  }
-
-  function render(winLine) {
-    var el = document.getElementById('board'); el.innerHTML = '';
-    board.forEach(function(v, i) {
-      var c = document.createElement('div');
-      var cls = 'cell';
-      if (v) { cls += ' taken ' + v.toLowerCase(); if (winLine && winLine.indexOf(i) > -1) cls += ' win'; }
-      c.className = cls;
-      c.textContent = v === 'X' ? '✕' : v === 'O' ? '○' : '';
-      c.onclick = (function(idx){ return function(){ move(idx); }; })(i);
-      el.appendChild(c);
+  const btn=document.getElementById('btn-rematch');
+  if (d.status!=='done') { btn.style.display='none'; return; }
+  const myReq = myRole==='X'?d.rematchX:d.rematchO;
+  const otherReq = myRole==='X'?d.rematchO:d.rematchX;
+  btn.style.display='block'; btn.disabled=false;
+  if (myReq && !otherReq) { btn.textContent='ממתין לאישור...'; btn.disabled=true; }
+  else if (!myReq && otherReq) { btn.textContent='קבל משחק חוזר'; }
+  else { btn.textContent='בקש משחק חוזר'; }
+  if (myReq && otherReq) {
+    btn.style.display='none';
+    update(ref(db,'rooms/'+roomCode),{
+      board:Array(9).fill(''), turn:'X', status:'playing',
+      winner:null, winLine:null, rematchX:false, rematchO:false
     });
   }
+}
 
-  function move(i) {
-    if (over || board[i]) return;
-    board[i] = cur;
-    var w = check();
-    if (w) {
-      over = true;
-      var now = new Date().toLocaleDateString('he-IL');
-      if (w.draw) {
-        SC.D++; setStatus('draw');
-        hist.unshift({ r: 'D', d: now }); render();
-      } else {
-        SC[cur]++; updateScores(); setStatus('win', cur);
-        hist.unshift({ r: cur, d: now }); render(w.line);
-      }
-      if (hist.length > MAX) hist = hist.slice(0, MAX);
-      save(); renderHist(); return;
-    }
-    cur = cur === 'X' ? 'O' : 'X';
-    render(); setStatus('turn'); updateCards();
+async function makeMove(i, d) {
+  const board=[...d.board]; board[i]=myRole;
+  let winner=null, winLine=null, status='playing';
+  for (const l of WINS) {
+    if (board[l[0]]&&board[l[0]]===board[l[1]]&&board[l[0]]===board[l[2]]) { winner=myRole; winLine=l; break; }
   }
-
-  function check() {
-    for (var i = 0; i < WINS.length; i++) {
-      var l = WINS[i];
-      if (board[l[0]] && board[l[0]] === board[l[1]] && board[l[0]] === board[l[2]]) return { line: l };
-    }
-    if (board.every(function(v){ return v; })) return { draw: true, line: [] };
-    return null;
+  if (!winner && board.every(v=>v)) winner='draw';
+  if (winner) {
+    status='done';
+    const sc = (await get(ref(db,'rooms/'+roomCode+'/scores'))).val()||{X:0,O:0};
+    if (winner!=='draw') sc[myRole]++;
+    await update(ref(db,'rooms/'+roomCode),{board,turn:myRole==='X'?'O':'X',status,winner,winLine:winLine||null,scores:sc,rematchX:false,rematchO:false});
+  } else {
+    await update(ref(db,'rooms/'+roomCode),{board,turn:myRole==='X'?'O':'X'});
   }
+}
 
-  function setStatus(type, who) {
-    var el = document.getElementById('status');
-    el.className = 'status-bar';
-    if (type === 'turn') { el.textContent = 'תורו של ' + P[cur]; el.classList.add(cur === 'X' ? 'status-turn-x' : 'status-turn-o'); }
-    else if (type === 'win') { el.textContent = P[who] + ' ניצח!'; el.classList.add(who === 'X' ? 'status-win-x' : 'status-win-o'); }
-    else { el.textContent = 'תיקו!'; el.classList.add('status-draw'); }
+async function requestRematch() {
+  await update(ref(db,'rooms/'+roomCode), myRole==='X'?{rematchX:true}:{rematchO:true});
+}
+
+function doLeave(clean=true) {
+  if (unsub) { unsub(); unsub=null; }
+  if (clean && roomCode) {
+    if (myRole==='X') remove(ref(db,'rooms/'+roomCode));
+    else update(ref(db,'rooms/'+roomCode),{playerO:'',status:'waiting',rematchO:false});
   }
+  myName=''; myRole=''; roomCode='';
+  document.getElementById('input-name').value='';
+  document.getElementById('input-code').value='';
+  document.getElementById('err-lobby').textContent='';
+  showScreen('screen-lobby');
+}
 
-  function updateCards() {
-    document.getElementById('cx').className = 'pcard pcard-x' + (cur === 'X' && !over ? ' active' : '');
-    document.getElementById('co').className = 'pcard pcard-o' + (cur === 'O' && !over ? ' active' : '');
-  }
-
-  function updateScores() {
-    document.getElementById('sx').textContent = SC.X + ' נצחונות';
-    document.getElementById('so').textContent = SC.O + ' נצחונות';
-    document.getElementById('total-x').textContent = SC.X;
-    document.getElementById('total-o').textContent = SC.O;
-    document.getElementById('total-d').textContent = SC.D;
-  }
-
-  function renderHist() {
-    var el = document.getElementById('hist');
-    if (!hist.length) { el.innerHTML = '<div style="font-size:13px;color:#bbb;padding:8px">אין משחקים עדיין</div>'; return; }
-    el.innerHTML = hist.map(function(h, i) {
-      var badge = h.r === 'D'
-        ? '<span class="badge badge-d">תיקו</span>'
-        : h.r === 'X'
-          ? '<span class="badge badge-x">✕ ' + P.X + ' ניצח</span>'
-          : '<span class="badge badge-o">○ ' + P.O + ' ניצח</span>';
-      return '<div class="h-row"><span class="h-num">' + (hist.length - i) + '</span>' + badge + '<span class="h-date">' + (h.d || '') + '</span></div>';
-    }).join('');
-  }
-
-  function clearHistory() {
-    if (!confirm('למחוק את כל ההיסטוריה והניקוד?')) return;
-    hist = []; SC = { X:0, O:0, D:0 };
-    save(); updateScores(); renderHist();
-  }
-
-  function logout() {
-    document.getElementById('screen-game').style.display = 'none';
-    document.getElementById('screen-login').style.display = '';
-    document.getElementById('err').textContent = '';
-    checkSaved();
-  }
-
-  checkSaved();
+document.getElementById('btn-create').onclick = createRoom;
+document.getElementById('btn-join').onclick = joinRoom;
+document.getElementById('btn-cancel').onclick = ()=>doLeave(true);
+document.getElementById('btn-leave').onclick = ()=>doLeave(true);
+document.getElementById('btn-rematch').onclick = requestRematch;
 </script>
 </body>
 </html>
