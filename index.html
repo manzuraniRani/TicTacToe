@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>אקס עיגול</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0edf8; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+  #app { width: 100%; max-width: 460px; }
+
+  .screen-title { font-size: 26px; font-weight: bold; text-align: center; color: #26215C; margin-bottom: 0.25rem; }
+  .screen-sub { font-size: 14px; text-align: center; color: #888780; margin-bottom: 1.5rem; }
+
+  .draw-dots { display: flex; justify-content: center; gap: 6px; margin-bottom: 1rem; padding-top: 1rem; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+  .dot-x { background: #534AB7; }
+  .dot-sep { background: #ccc; }
+  .dot-o { background: #0F6E56; }
+
+  .login-card { background: #fff; border: 1px solid #ddd; border-radius: 16px; padding: 1.75rem; }
+  .field { margin-bottom: 1rem; }
+  label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 6px; }
+  .label-x { color: #534AB7; }
+  .label-o { color: #0F6E56; }
+  input[type="text"] { width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 8px; outline: none; font-family: Arial, sans-serif; direction: rtl; }
+  input[type="text"]:focus { border-color: #534AB7; box-shadow: 0 0 0 3px #EEEDFE; }
+  .err { font-size: 13px; color: #c0392b; min-height: 18px; margin-top: 6px; }
+  .btn-start { width: 100%; margin-top: 0.75rem; padding: 13px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 10px; border: none; background: #534AB7; color: #EEEDFE; font-family: Arial, sans-serif; }
+  .btn-start:hover { background: #3C3489; }
+
+  .saved-badge { font-size: 12px; background: #E1F5EE; color: #085041; border-radius: 8px; padding: 8px 12px; margin-bottom: 1rem; text-align: center; border: 1px solid #5DCAA5; }
+
+  .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
+  .pcard { border-radius: 12px; padding: 14px 12px; text-align: center; border: 2px solid transparent; transition: border-color 0.15s; }
+  .pcard-x { background: #EEEDFE; }
+  .pcard-o { background: #E1F5EE; }
+  .pcard-x.active { border-color: #534AB7; }
+  .pcard-o.active { border-color: #1D9E75; }
+  .pcard-name { font-size: 12px; font-weight: bold; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pcard-x .pcard-name { color: #3C3489; }
+  .pcard-o .pcard-name { color: #085041; }
+  .pcard-sym { font-size: 32px; font-weight: bold; line-height: 1; }
+  .sym-x { color: #534AB7; }
+  .sym-o { color: #0F6E56; }
+  .pcard-score { font-size: 12px; margin-top: 4px; }
+  .pcard-x .pcard-score { color: #534AB7; }
+  .pcard-o .pcard-score { color: #0F6E56; }
+
+  .status-bar { text-align: center; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 8px; margin-bottom: 1rem; min-height: 40px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #333; }
+  .status-win-x { background: #EEEDFE; color: #3C3489; }
+  .status-win-o { background: #E1F5EE; color: #085041; }
+  .status-draw { background: #FAEEDA; color: #633806; }
+  .status-turn-x { color: #534AB7; background: #f5f5f5; }
+  .status-turn-o { color: #0F6E56; background: #f5f5f5; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
+  .cell { aspect-ratio: 1; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 44px; font-weight: bold; cursor: pointer; border: 2px solid #e0e0e0; background: #fff; transition: background 0.1s, border-color 0.1s; user-select: none; }
+  .cell:hover:not(.taken) { background: #f0edf8; border-color: #AFA9EC; }
+  .cell.x { background: #EEEDFE; border-color: #AFA9EC; color: #3C3489; cursor: default; }
+  .cell.o { background: #E1F5EE; border-color: #5DCAA5; color: #085041; cursor: default; }
+  .cell.win { background: #FAC775; border-color: #BA7517; color: #412402; }
+
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+  .btn { padding: 11px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family: Arial, sans-serif; }
+  .btn-new { background: #EEEDFE; color: #3C3489; border: 1px solid #AFA9EC; }
+  .btn-new:hover { background: #CECBF6; }
+  .btn-exit { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
+  .btn-exit:hover { background: #e8e8e8; }
+
+  .history-wrap { border-top: 1px solid #e0e0e0; padding-top: 1rem; margin-bottom: 1rem; }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .history-title { font-size: 13px; font-weight: bold; color: #888; }
+  .btn-clear { font-size: 11px; background: none; border: 1px solid #e0b0b0; color: #c0392b; cursor: pointer; font-family: Arial, sans-serif; padding: 3px 8px; border-radius: 6px; }
+  .btn-clear:hover { background: #fdecea; }
+
+  .hist-list { max-height: 340px; overflow-y: auto; border-radius: 8px; }
+  .h-row { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 8px; font-size: 13px; padding: 6px 8px; border-radius: 6px; margin-bottom: 3px; }
+  .h-row:nth-child(odd) { background: #f9f9f9; }
+  .h-num { color: #bbb; font-size: 11px; text-align: center; }
+  .h-date { font-size: 11px; color: #bbb; text-align: left; }
+  .badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-x { background: #EEEDFE; color: #3C3489; }
+  .badge-o { background: #E1F5EE; color: #085041; }
+  .badge-d { background: #FAEEDA; color: #633806; }
+
+  .storage-note { font-size: 11px; color: #bbb; text-align: center; padding-bottom: 1rem; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+  .stat-box { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 10px; text-align: center; }
+  .stat-num { font-size: 22px; font-weight: bold; }
+  .stat-num-x { color: #534AB7; }
+  .stat-num-o { color: #0F6E56; }
+  .stat-num-d { color: #BA7517; }
+  .stat-lbl { font-size: 11px; color: #aaa; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<div id="screen-login">
+  <div class="draw-dots">
+    <div class="dot dot-x"></div><div class="dot dot-x"></div>
+    <div class="dot dot-sep"></div>
+    <div class="dot dot-o"></div><div class="dot dot-o"></div>
+  </div>
+  <div class="screen-title">אקס עיגול</div>
+  <div class="screen-sub">הכנס שמות כדי להתחיל</div>
+  <div class="login-card">
+    <div id="saved-hint" style="display:none" class="saved-badge">נמצא ניקוד שמור — הזן את אותם שמות כדי לשחזר אותו</div>
+    <div class="field">
+      <label class="label-x">שחקן 1 — ✕</label>
+      <input type="text" id="p1" placeholder="שם שחקן..." maxlength="18" />
+    </div>
+    <div class="field">
+      <label class="label-o">שחקן 2 — ○</label>
+      <input type="text" id="p2" placeholder="שם שחקן..." maxlength="18" />
+    </div>
+    <div class="err" id="err"></div>
+    <button class="btn-start" onclick="startGame()">בוא נשחק</button>
+  </div>
+</div>
+
+<div id="screen-game" style="display:none; padding-top:1rem">
+  <div class="players-grid">
+    <div class="pcard pcard-x" id="cx">
+      <div class="pcard-name" id="nx"></div>
+      <div class="pcard-sym sym-x">✕</div>
+      <div class="pcard-score" id="sx">0 נצחונות</div>
+    </div>
+    <div class="pcard pcard-o" id="co">
+      <div class="pcard-name" id="no"></div>
+      <div class="pcard-sym sym-o">○</div>
+      <div class="pcard-score" id="so">0 נצחונות</div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-box">
+      <div class="stat-num stat-num-x" id="total-x">0</div>
+      <div class="stat-lbl" id="lbl-x">נצחונות</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num stat-num-d" id="total-d">0</div>
+      <div class="stat-lbl">תיקו</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num stat-num-o" id="total-o">0</div>
+      <div class="stat-lbl" id="lbl-o">נצחונות</div>
+    </div>
+  </div>
+
+  <div class="status-bar" id="status"></div>
+  <div class="board" id="board"></div>
+  <div class="btn-row">
+    <button class="btn btn-new" onclick="resetBoard()">משחק חדש</button>
+    <button class="btn btn-exit" onclick="logout()">יציאה</button>
+  </div>
+
+  <div class="history-wrap">
+    <div class="history-header">
+      <div class="history-title">היסטוריית משחקים (עד 20 אחרונים)</div>
+      <button class="btn-clear" onclick="clearHistory()">נקה היסטוריה</button>
+    </div>
+    <div class="hist-list" id="hist"></div>
+  </div>
+  <div class="storage-note">ההיסטוריה נשמרת אוטומטית בדפדפן גם לאחר סגירת הדף</div>
+</div>
+
+</div>
+<script>
+  let P = { X: '', O: '' };
+  let SC = { X: 0, O: 0, D: 0 };
+  let board = Array(9).fill('');
+  let cur = 'X', over = false, hist = [];
+  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+  const MAX_HIST = 20;
+
+  function saveKey(a, b) { return 'ttt__' + [a, b].sort().join('|||'); }
+
+  function loadData(a, b) {
+    try {
+      const raw = localStorage.getItem(saveKey(a, b));
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  function saveData() {
+    try {
+      localStorage.setItem(saveKey(P.X, P.O), JSON.stringify({ SC, hist }));
+    } catch(e) {}
+  }
+
+  function checkSaved() {
+    for (let i = 0; i < localStorage.length; i++) {
+      if (localStorage.key(i).startsWith('ttt__')) {
+        document.getElementById('saved-hint').style.display = 'block';
+        return;
+      }
+    }
+  }
+
+  function startGame() {
+    const a = document.getElementById('p1').value.trim();
+    const b = document.getElementById('p2').value.trim();
+    const e = document.getElementById('err');
+    if (!a || !b) { e.textContent = 'יש להזין שמות לשני השחקנים'; return; }
+    if (a === b) { e.textContent = 'השמות חייבים להיות שונים'; return; }
+    P.X = a; P.O = b;
+    const saved = loadData(a, b);
+    if (saved) { SC = saved.SC; hist = saved.hist || []; }
+    else { SC = { X: 0, O: 0, D: 0 }; hist = []; }
+    document.getElementById('screen-login').style.display = 'none';
+    document.getElementById('screen-game').style.display = '';
+    document.getElementById('nx').textContent = a;
+    document.getElementById('no').textContent = b;
+    document.getElementById('lbl-x').textContent = a;
+    document.getElementById('lbl-o').textContent = b;
+    updateScores();
+    renderHist();
+    resetBoard();
+  }
+
+  function resetBoard() {
+    board = Array(9).fill(''); cur = 'X'; over = false;
+    render(); setStatus('turn'); updateCards();
+  }
+
+  function render(winLine) {
+    const el = document.getElementById('board'); el.innerHTML = '';
+    board.forEach((v, i) => {
+      const c = document.createElement('div');
+      let cls = 'cell';
+      if (v) { cls += ' taken ' + v.toLowerCase(); if (winLine && winLine.includes(i)) cls += ' win'; }
+      c.className = cls;
+      c.textContent = v === 'X' ? '✕' : v === 'O' ? '○' : '';
+      c.onclick = () => move(i);
+      el.appendChild(c);
+    });
+  }
+
+  function move(i) {
+    if (over || board[i]) return;
+    board[i] = cur;
+    const w = check();
+    if (w) {
+      over = true;
+      const now = new Date().toLocaleDateString('he-IL');
+      if (w.draw) {
+        SC.D++;
+        setStatus('draw');
+        hist.unshift({ r: 'D', d: now });
+        render();
+      } else {
+        SC[cur]++;
+        updateScores();
+        setStatus('win', cur);
+        hist.unshift({ r: cur, d: now });
+        render(w.line);
+      }
+      if (hist.length > MAX_HIST) hist = hist.slice(0, MAX_HIST);
+      saveData();
+      renderHist();
+      return;
+    }
+    cur = cur === 'X' ? 'O' : 'X';
+    render(); setStatus('turn'); updateCards();
+  }
+
+  function check() {
+    for (const l of WINS) {
+      const [a, b, c] = l;
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) return { line: l };
+    }
+    if (board.every(v => v)) return { draw: true, line: [] };
+    return null;
+  }
+
+  function setStatus(type, who) {
+    const el = document.getElementById('status');
+    el.className = 'status-bar';
+    if (type === 'turn') { el.textContent = 'תורו של ' + P[cur]; el.classList.add(cur === 'X' ? 'status-turn-x' : 'status-turn-o'); }
+    else if (type === 'win') { el.textContent = P[who] + ' ניצח! 🎉'; el.classList.add(who === 'X' ? 'status-win-x' : 'status-win-o'); }
+    else { el.textContent = 'תיקו!'; el.classList.add('status-draw'); }
+  }
+
+  function updateCards() {
+    document.getElementById('cx').className = 'pcard pcard-x' + (cur === 'X' && !over ? ' active' : '');
+    document.getElementById('co').className = 'pcard pcard-o' + (cur === 'O' && !over ? ' active' : '');
+  }
+
+  function updateScores() {
+    document.getElementById('sx').textContent = SC.X + ' נצחונות';
+    document.getElementById('so').textContent = SC.O + ' נצחונות';
+    document.getElementById('total-x').textContent = SC.X;
+    document.getElementById('total-o').textContent = SC.O;
+    document.getElementById('total-d').textContent = SC.D;
+  }
+
+  function renderHist() {
+    const el = document.getElementById('hist');
+    if (!hist.length) {
+      el.innerHTML = '<div style="font-size:13px;color:#bbb;padding:8px">אין משחקים עדיין</div>';
+      return;
+    }
+    el.innerHTML = hist.map((h, i) => {
+      const badge = h.r === 'D'
+        ? '<span class="badge badge-d">תיקו</span>'
+        : h.r === 'X'
+          ? `<span class="badge badge-x">✕ ${P.X} ניצח</span>`
+          : `<span class="badge badge-o">○ ${P.O} ניצח</span>`;
+      return `<div class="h-row">
+        <span class="h-num">${hist.length - i}</span>
+        ${badge}
+        <span class="h-date">${h.d || ''}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function clearHistory() {
+    if (!confirm('למחוק את כל ההיסטוריה?')) return;
+    hist = [];
+    saveData();
+    renderHist();
+  }
+
+  function logout() {
+    document.getElementById('screen-game').style.display = 'none';
+    document.getElementById('screen-login').style.display = '';
+    document.getElementById('p1').value = '';
+    document.getElementById('p2').value = '';
+    document.getElementById('err').textContent = '';
+    checkSaved();
+  }
+
+  checkSaved();
+</script>
+</body>
+</html>
