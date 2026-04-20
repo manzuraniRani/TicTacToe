@@ -28,7 +28,6 @@
   .err { font-size: 13px; color: #c0392b; min-height: 18px; margin-top: 6px; }
   .btn-start { width: 100%; margin-top: 0.75rem; padding: 13px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 10px; border: none; background: #534AB7; color: #EEEDFE; font-family: Arial, sans-serif; }
   .btn-start:hover { background: #3C3489; }
-
   .saved-badge { font-size: 12px; background: #E1F5EE; color: #085041; border-radius: 8px; padding: 8px 12px; margin-bottom: 1rem; text-align: center; border: 1px solid #5DCAA5; }
 
   .players-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem; }
@@ -61,30 +60,16 @@
   .cell.o { background: #E1F5EE; border-color: #5DCAA5; color: #085041; cursor: default; }
   .cell.win { background: #FAC775; border-color: #BA7517; color: #412402; }
 
-  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1.25rem; }
+  .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 1rem; }
   .btn { padding: 11px; font-size: 14px; font-weight: bold; cursor: pointer; border-radius: 8px; font-family: Arial, sans-serif; }
   .btn-new { background: #EEEDFE; color: #3C3489; border: 1px solid #AFA9EC; }
   .btn-new:hover { background: #CECBF6; }
   .btn-exit { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
   .btn-exit:hover { background: #e8e8e8; }
 
-  .history-wrap { border-top: 1px solid #e0e0e0; padding-top: 1rem; margin-bottom: 1rem; }
-  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .history-title { font-size: 13px; font-weight: bold; color: #888; }
-  .btn-clear { font-size: 11px; background: none; border: 1px solid #e0b0b0; color: #c0392b; cursor: pointer; font-family: Arial, sans-serif; padding: 3px 8px; border-radius: 6px; }
-  .btn-clear:hover { background: #fdecea; }
-
-  .hist-list { max-height: 340px; overflow-y: auto; border-radius: 8px; }
-  .h-row { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 8px; font-size: 13px; padding: 6px 8px; border-radius: 6px; margin-bottom: 3px; }
-  .h-row:nth-child(odd) { background: #f9f9f9; }
-  .h-num { color: #bbb; font-size: 11px; text-align: center; }
-  .h-date { font-size: 11px; color: #bbb; text-align: left; }
-  .badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
-  .badge-x { background: #EEEDFE; color: #3C3489; }
-  .badge-o { background: #E1F5EE; color: #085041; }
-  .badge-d { background: #FAEEDA; color: #633806; }
-
-  .storage-note { font-size: 11px; color: #bbb; text-align: center; padding-bottom: 1rem; }
+  .save-indicator { font-size: 11px; text-align: center; padding: 5px 10px; border-radius: 6px; margin-bottom: 0.75rem; }
+  .save-ok { background: #E1F5EE; color: #085041; }
+  .save-err { background: #fdecea; color: #c0392b; }
 
   .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
   .stat-box { background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 10px; text-align: center; }
@@ -93,6 +78,21 @@
   .stat-num-o { color: #0F6E56; }
   .stat-num-d { color: #BA7517; }
   .stat-lbl { font-size: 11px; color: #aaa; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .history-wrap { border-top: 1px solid #e0e0e0; padding-top: 1rem; margin-bottom: 1rem; }
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .history-title { font-size: 13px; font-weight: bold; color: #888; }
+  .btn-clear { font-size: 11px; background: none; border: 1px solid #e0b0b0; color: #c0392b; cursor: pointer; font-family: Arial, sans-serif; padding: 3px 8px; border-radius: 6px; }
+  .btn-clear:hover { background: #fdecea; }
+  .hist-list { max-height: 360px; overflow-y: auto; border-radius: 8px; }
+  .h-row { display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 8px; font-size: 13px; padding: 7px 8px; border-radius: 6px; margin-bottom: 3px; }
+  .h-row:nth-child(odd) { background: #f9f9f9; }
+  .h-num { color: #bbb; font-size: 11px; text-align: center; }
+  .h-date { font-size: 11px; color: #bbb; }
+  .badge { font-size: 11px; font-weight: bold; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+  .badge-x { background: #EEEDFE; color: #3C3489; }
+  .badge-o { background: #E1F5EE; color: #085041; }
+  .badge-d { background: #FAEEDA; color: #633806; }
 </style>
 </head>
 <body>
@@ -107,7 +107,7 @@
   <div class="screen-title">אקס עיגול</div>
   <div class="screen-sub">הכנס שמות כדי להתחיל</div>
   <div class="login-card">
-    <div id="saved-hint" style="display:none" class="saved-badge">נמצא ניקוד שמור — הזן את אותם שמות כדי לשחזר אותו</div>
+    <div id="saved-hint" style="display:none" class="saved-badge"></div>
     <div class="field">
       <label class="label-x">שחקן 1 — ✕</label>
       <input type="text" id="p1" placeholder="שם שחקן..." maxlength="18" />
@@ -157,68 +157,84 @@
     <button class="btn btn-exit" onclick="logout()">יציאה</button>
   </div>
 
+  <div id="save-ind" style="display:none"></div>
+
   <div class="history-wrap">
     <div class="history-header">
       <div class="history-title">היסטוריית משחקים (עד 20 אחרונים)</div>
-      <button class="btn-clear" onclick="clearHistory()">נקה היסטוריה</button>
+      <button class="btn-clear" onclick="clearHistory()">נקה הכל</button>
     </div>
     <div class="hist-list" id="hist"></div>
   </div>
-  <div class="storage-note">ההיסטוריה נשמרת אוטומטית בדפדפן גם לאחר סגירת הדף</div>
 </div>
 
 </div>
 <script>
-  let P = { X: '', O: '' };
-  let SC = { X: 0, O: 0, D: 0 };
-  let board = Array(9).fill('');
-  let cur = 'X', over = false, hist = [];
-  const WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
-  const MAX_HIST = 20;
+  var KEY = 'tictactoe_v1';
+  var MAX = 20;
+  var P = { X: '', O: '' };
+  var SC = { X: 0, O: 0, D: 0 };
+  var board = Array(9).fill('');
+  var cur = 'X', over = false, hist = [];
+  var WINS = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 
-  function saveKey(a, b) { return 'ttt__' + [a, b].sort().join('|||'); }
-
-  function loadData(a, b) {
-    try {
-      const raw = localStorage.getItem(saveKey(a, b));
-      return raw ? JSON.parse(raw) : null;
-    } catch(e) { return null; }
+  function load() {
+    try { var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; }
+    catch(e) { return null; }
   }
 
-  function saveData() {
+  function save() {
+    var ind = document.getElementById('save-ind');
     try {
-      localStorage.setItem(saveKey(P.X, P.O), JSON.stringify({ SC, hist }));
-    } catch(e) {}
+      localStorage.setItem(KEY, JSON.stringify({ P: P, SC: SC, hist: hist }));
+      ind.className = 'save-indicator save-ok';
+      ind.textContent = 'נשמר';
+      ind.style.display = 'block';
+      setTimeout(function(){ ind.style.display = 'none'; }, 1500);
+    } catch(e) {
+      ind.className = 'save-indicator save-err';
+      ind.textContent = 'שגיאה בשמירה — ' + e.message;
+      ind.style.display = 'block';
+    }
   }
 
   function checkSaved() {
-    for (let i = 0; i < localStorage.length; i++) {
-      if (localStorage.key(i).startsWith('ttt__')) {
-        document.getElementById('saved-hint').style.display = 'block';
-        return;
-      }
+    var d = load();
+    var hint = document.getElementById('saved-hint');
+    if (d && d.P && d.P.X && d.P.O) {
+      hint.style.display = 'block';
+      hint.textContent = 'נמצא משחק שמור: ' + d.P.X + ' מול ' + d.P.O;
+      document.getElementById('p1').value = d.P.X;
+      document.getElementById('p2').value = d.P.O;
+    } else {
+      hint.style.display = 'none';
     }
   }
 
   function startGame() {
-    const a = document.getElementById('p1').value.trim();
-    const b = document.getElementById('p2').value.trim();
-    const e = document.getElementById('err');
+    var a = document.getElementById('p1').value.trim();
+    var b = document.getElementById('p2').value.trim();
+    var e = document.getElementById('err');
     if (!a || !b) { e.textContent = 'יש להזין שמות לשני השחקנים'; return; }
     if (a === b) { e.textContent = 'השמות חייבים להיות שונים'; return; }
+
+    var d = load();
+    if (d && d.P && d.P.X === a && d.P.O === b) {
+      SC = d.SC || { X:0, O:0, D:0 };
+      hist = d.hist || [];
+    } else {
+      SC = { X:0, O:0, D:0 };
+      hist = [];
+    }
+
     P.X = a; P.O = b;
-    const saved = loadData(a, b);
-    if (saved) { SC = saved.SC; hist = saved.hist || []; }
-    else { SC = { X: 0, O: 0, D: 0 }; hist = []; }
     document.getElementById('screen-login').style.display = 'none';
     document.getElementById('screen-game').style.display = '';
     document.getElementById('nx').textContent = a;
     document.getElementById('no').textContent = b;
     document.getElementById('lbl-x').textContent = a;
     document.getElementById('lbl-o').textContent = b;
-    updateScores();
-    renderHist();
-    resetBoard();
+    updateScores(); renderHist(); resetBoard();
   }
 
   function resetBoard() {
@@ -227,14 +243,14 @@
   }
 
   function render(winLine) {
-    const el = document.getElementById('board'); el.innerHTML = '';
-    board.forEach((v, i) => {
-      const c = document.createElement('div');
-      let cls = 'cell';
-      if (v) { cls += ' taken ' + v.toLowerCase(); if (winLine && winLine.includes(i)) cls += ' win'; }
+    var el = document.getElementById('board'); el.innerHTML = '';
+    board.forEach(function(v, i) {
+      var c = document.createElement('div');
+      var cls = 'cell';
+      if (v) { cls += ' taken ' + v.toLowerCase(); if (winLine && winLine.indexOf(i) > -1) cls += ' win'; }
       c.className = cls;
       c.textContent = v === 'X' ? '✕' : v === 'O' ? '○' : '';
-      c.onclick = () => move(i);
+      c.onclick = (function(idx){ return function(){ move(idx); }; })(i);
       el.appendChild(c);
     });
   }
@@ -242,45 +258,38 @@
   function move(i) {
     if (over || board[i]) return;
     board[i] = cur;
-    const w = check();
+    var w = check();
     if (w) {
       over = true;
-      const now = new Date().toLocaleDateString('he-IL');
+      var now = new Date().toLocaleDateString('he-IL');
       if (w.draw) {
-        SC.D++;
-        setStatus('draw');
-        hist.unshift({ r: 'D', d: now });
-        render();
+        SC.D++; setStatus('draw');
+        hist.unshift({ r: 'D', d: now }); render();
       } else {
-        SC[cur]++;
-        updateScores();
-        setStatus('win', cur);
-        hist.unshift({ r: cur, d: now });
-        render(w.line);
+        SC[cur]++; updateScores(); setStatus('win', cur);
+        hist.unshift({ r: cur, d: now }); render(w.line);
       }
-      if (hist.length > MAX_HIST) hist = hist.slice(0, MAX_HIST);
-      saveData();
-      renderHist();
-      return;
+      if (hist.length > MAX) hist = hist.slice(0, MAX);
+      save(); renderHist(); return;
     }
     cur = cur === 'X' ? 'O' : 'X';
     render(); setStatus('turn'); updateCards();
   }
 
   function check() {
-    for (const l of WINS) {
-      const [a, b, c] = l;
-      if (board[a] && board[a] === board[b] && board[a] === board[c]) return { line: l };
+    for (var i = 0; i < WINS.length; i++) {
+      var l = WINS[i];
+      if (board[l[0]] && board[l[0]] === board[l[1]] && board[l[0]] === board[l[2]]) return { line: l };
     }
-    if (board.every(v => v)) return { draw: true, line: [] };
+    if (board.every(function(v){ return v; })) return { draw: true, line: [] };
     return null;
   }
 
   function setStatus(type, who) {
-    const el = document.getElementById('status');
+    var el = document.getElementById('status');
     el.className = 'status-bar';
     if (type === 'turn') { el.textContent = 'תורו של ' + P[cur]; el.classList.add(cur === 'X' ? 'status-turn-x' : 'status-turn-o'); }
-    else if (type === 'win') { el.textContent = P[who] + ' ניצח! 🎉'; el.classList.add(who === 'X' ? 'status-win-x' : 'status-win-o'); }
+    else if (type === 'win') { el.textContent = P[who] + ' ניצח!'; el.classList.add(who === 'X' ? 'status-win-x' : 'status-win-o'); }
     else { el.textContent = 'תיקו!'; el.classList.add('status-draw'); }
   }
 
@@ -298,37 +307,27 @@
   }
 
   function renderHist() {
-    const el = document.getElementById('hist');
-    if (!hist.length) {
-      el.innerHTML = '<div style="font-size:13px;color:#bbb;padding:8px">אין משחקים עדיין</div>';
-      return;
-    }
-    el.innerHTML = hist.map((h, i) => {
-      const badge = h.r === 'D'
+    var el = document.getElementById('hist');
+    if (!hist.length) { el.innerHTML = '<div style="font-size:13px;color:#bbb;padding:8px">אין משחקים עדיין</div>'; return; }
+    el.innerHTML = hist.map(function(h, i) {
+      var badge = h.r === 'D'
         ? '<span class="badge badge-d">תיקו</span>'
         : h.r === 'X'
-          ? `<span class="badge badge-x">✕ ${P.X} ניצח</span>`
-          : `<span class="badge badge-o">○ ${P.O} ניצח</span>`;
-      return `<div class="h-row">
-        <span class="h-num">${hist.length - i}</span>
-        ${badge}
-        <span class="h-date">${h.d || ''}</span>
-      </div>`;
+          ? '<span class="badge badge-x">✕ ' + P.X + ' ניצח</span>'
+          : '<span class="badge badge-o">○ ' + P.O + ' ניצח</span>';
+      return '<div class="h-row"><span class="h-num">' + (hist.length - i) + '</span>' + badge + '<span class="h-date">' + (h.d || '') + '</span></div>';
     }).join('');
   }
 
   function clearHistory() {
-    if (!confirm('למחוק את כל ההיסטוריה?')) return;
-    hist = [];
-    saveData();
-    renderHist();
+    if (!confirm('למחוק את כל ההיסטוריה והניקוד?')) return;
+    hist = []; SC = { X:0, O:0, D:0 };
+    save(); updateScores(); renderHist();
   }
 
   function logout() {
     document.getElementById('screen-game').style.display = 'none';
     document.getElementById('screen-login').style.display = '';
-    document.getElementById('p1').value = '';
-    document.getElementById('p2').value = '';
     document.getElementById('err').textContent = '';
     checkSaved();
   }
