@@ -63,6 +63,7 @@
   .you-badge { font-size: 10px; border-radius: 10px; padding: 2px 8px; margin-top: 4px; display: inline-block; }
   .you-badge-x { background: #534AB7; color: #EEEDFE; }
   .you-badge-o { background: #0F6E56; color: #E1F5EE; }
+  .first-badge { font-size: 10px; background: #FAC775; color: #412402; border-radius: 10px; padding: 2px 8px; margin-top: 3px; display: inline-block; }
 
   .status-bar { text-align: center; font-size: 15px; font-weight: bold; padding: 10px; border-radius: 8px; margin-bottom: 1rem; min-height: 40px; display: flex; align-items: center; justify-content: center; background: #f5f5f5; color: #333; }
   .status-win-x { background: #EEEDFE; color: #3C3489; }
@@ -144,18 +145,20 @@
         <div class="pcard-sym sym-x">✕</div>
         <div class="pcard-score" id="sx">0 נצחונות</div>
         <div id="you-x" style="display:none" class="you-badge you-badge-x">אתה</div>
+        <div id="first-x" style="display:none" class="first-badge">מתחיל</div>
       </div>
       <div class="pcard pcard-o" id="co">
         <div class="pcard-name" id="no">שחקן 2</div>
         <div class="pcard-sym sym-o">○</div>
         <div class="pcard-score" id="so">0 נצחונות</div>
         <div id="you-o" style="display:none" class="you-badge you-badge-o">אתה</div>
+        <div id="first-o" style="display:none" class="first-badge">מתחיל</div>
       </div>
     </div>
     <div class="status-bar" id="status">טוען...</div>
     <div class="board" id="board"></div>
     <div class="btn-row">
-      <button class="btn-sm btn-rematch" id="btn-rematch" style="display:none" id="btn-rematch">משחק חוזר</button>
+      <button class="btn-sm btn-rematch" id="btn-rematch" style="display:none">משחק חוזר</button>
       <button class="btn-sm btn-gray" id="btn-leave">יציאה</button>
     </div>
   </div>
@@ -164,7 +167,7 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, update, onValue, remove, serverTimestamp }
+import { getDatabase, ref, set, get, update, onValue, remove }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const cfg = {
@@ -196,13 +199,16 @@ async function createRoom() {
   err.textContent='';
   myName=name; myRole='X'; roomCode=randCode();
   await set(ref(db,'rooms/'+roomCode), {
-    playerX:name, playerO:'',
-    board:Array(9).fill(''), turn:'X',
-    status:'waiting', scores:{X:0,O:0},
-    rematchX:false, rematchO:false,
+    playerX: name, playerO: '',
+    board: Array(9).fill(''),
+    turn: 'X',
+    firstOfGame: 'X',
+    status: 'waiting',
+    scores: { X:0, O:0 },
+    rematchX: false, rematchO: false,
     ts: Date.now()
   });
-  document.getElementById('display-code').textContent=roomCode;
+  document.getElementById('display-code').textContent = roomCode;
   showScreen('screen-waiting');
   startListening();
 }
@@ -219,7 +225,7 @@ async function joinRoom() {
   const d = snap.val();
   if (d.playerO) { err.textContent='החדר כבר מלא'; return; }
   myName=name; myRole='O'; roomCode=code;
-  await update(ref(db,'rooms/'+code), {playerO:name, status:'playing'});
+  await update(ref(db,'rooms/'+code), { playerO:name, status:'playing' });
   showScreen('screen-game');
   startListening();
 }
@@ -240,90 +246,119 @@ function startListening() {
 function renderGame(d) {
   document.getElementById('nx').textContent = d.playerX||'שחקן 1';
   document.getElementById('no').textContent = d.playerO||'שחקן 2';
-  document.getElementById('you-x').style.display = myRole==='X'?'inline-block':'none';
-  document.getElementById('you-o').style.display = myRole==='O'?'inline-block':'none';
+  document.getElementById('you-x').style.display = myRole==='X' ? 'inline-block' : 'none';
+  document.getElementById('you-o').style.display = myRole==='O' ? 'inline-block' : 'none';
   document.getElementById('sx').textContent = (d.scores?.X||0)+' נצחונות';
   document.getElementById('so').textContent = (d.scores?.O||0)+' נצחונות';
+
+  document.getElementById('first-x').style.display = d.firstOfGame==='X' ? 'inline-block' : 'none';
+  document.getElementById('first-o').style.display = d.firstOfGame==='O' ? 'inline-block' : 'none';
+
   document.getElementById('disc-box').style.display =
     (d.status==='playing' && !d.playerO) ? 'block' : 'none';
 
   const myTurn = d.turn===myRole && d.status==='playing';
   const el = document.getElementById('board'); el.innerHTML='';
-  (d.board||Array(9).fill('')).forEach((v,i)=>{
-    const c=document.createElement('div');
-    let cls='cell';
-    if (v) { cls+=' taken '+v.toLowerCase(); if(d.winLine&&d.winLine.includes(i)) cls+=' win'; }
-    else if (!myTurn) cls+=' disabled';
-    c.className=cls;
-    c.textContent=v==='X'?'✕':v==='O'?'○':'';
-    if (!v && myTurn) c.onclick=()=>makeMove(i,d);
+  (d.board||Array(9).fill('')).forEach((v,i) => {
+    const c = document.createElement('div');
+    let cls = 'cell';
+    if (v) {
+      cls += ' taken '+v.toLowerCase();
+      if (d.winLine && d.winLine.includes(i)) cls += ' win';
+    } else if (!myTurn) {
+      cls += ' disabled';
+    }
+    c.className = cls;
+    c.textContent = v==='X' ? '✕' : v==='O' ? '○' : '';
+    if (!v && myTurn) c.onclick = () => makeMove(i, d);
     el.appendChild(c);
   });
 
   const st = document.getElementById('status');
-  st.className='status-bar';
+  st.className = 'status-bar';
   if (d.status==='playing') {
     if (d.turn===myRole) {
-      st.textContent='התור שלך!';
-      st.classList.add(myRole==='X'?'status-turn-x':'status-turn-o');
+      st.textContent = 'התור שלך!';
+      st.classList.add(myRole==='X' ? 'status-turn-x' : 'status-turn-o');
     } else {
-      const other = myRole==='X'?d.playerO:d.playerX;
-      st.textContent='ממתין ל'+other+'...';
+      const other = myRole==='X' ? d.playerO : d.playerX;
+      st.textContent = 'ממתין ל' + other + '...';
       st.classList.add('status-wait');
     }
   } else if (d.status==='done') {
-    if (d.winner==='draw') { st.textContent='תיקו!'; st.classList.add('status-draw'); }
-    else if (d.winner===myRole) { st.textContent='ניצחת! 🎉'; st.classList.add(myRole==='X'?'status-win-x':'status-win-o'); }
-    else { st.textContent=(myRole==='X'?d.playerO:d.playerX)+' ניצח'; st.classList.add(d.winner==='X'?'status-win-x':'status-win-o'); }
+    if (d.winner==='draw') {
+      st.textContent = 'תיקו!'; st.classList.add('status-draw');
+    } else if (d.winner===myRole) {
+      st.textContent = 'ניצחת! 🎉';
+      st.classList.add(myRole==='X' ? 'status-win-x' : 'status-win-o');
+    } else {
+      const other = myRole==='X' ? d.playerO : d.playerX;
+      st.textContent = other + ' ניצח';
+      st.classList.add(d.winner==='X' ? 'status-win-x' : 'status-win-o');
+    }
   }
 
-  const cx=document.getElementById('cx'), co=document.getElementById('co');
-  cx.className='pcard pcard-x'+(d.status==='playing'&&d.turn==='X'?' active':'');
-  co.className='pcard pcard-o'+(d.status==='playing'&&d.turn==='O'?' active':'');
+  document.getElementById('cx').className = 'pcard pcard-x' + (d.status==='playing'&&d.turn==='X' ? ' active' : '');
+  document.getElementById('co').className = 'pcard pcard-o' + (d.status==='playing'&&d.turn==='O' ? ' active' : '');
 
-  const btn=document.getElementById('btn-rematch');
+  const btn = document.getElementById('btn-rematch');
   if (d.status!=='done') { btn.style.display='none'; return; }
-  const myReq = myRole==='X'?d.rematchX:d.rematchO;
-  const otherReq = myRole==='X'?d.rematchO:d.rematchX;
+  const myReq = myRole==='X' ? d.rematchX : d.rematchO;
+  const otherReq = myRole==='X' ? d.rematchO : d.rematchX;
   btn.style.display='block'; btn.disabled=false;
   if (myReq && !otherReq) { btn.textContent='ממתין לאישור...'; btn.disabled=true; }
   else if (!myReq && otherReq) { btn.textContent='קבל משחק חוזר'; }
   else { btn.textContent='בקש משחק חוזר'; }
+
   if (myReq && otherReq) {
     btn.style.display='none';
-    update(ref(db,'rooms/'+roomCode),{
-      board:Array(9).fill(''), turn:'X', status:'playing',
-      winner:null, winLine:null, rematchX:false, rematchO:false
+    const nextFirst = d.firstOfGame==='X' ? 'O' : 'X';
+    update(ref(db,'rooms/'+roomCode), {
+      board: Array(9).fill(''),
+      turn: nextFirst,
+      firstOfGame: nextFirst,
+      status: 'playing',
+      winner: null,
+      winLine: null,
+      rematchX: false,
+      rematchO: false
     });
   }
 }
 
 async function makeMove(i, d) {
-  const board=[...d.board]; board[i]=myRole;
+  const board = [...d.board];
+  board[i] = myRole;
   let winner=null, winLine=null, status='playing';
   for (const l of WINS) {
-    if (board[l[0]]&&board[l[0]]===board[l[1]]&&board[l[0]]===board[l[2]]) { winner=myRole; winLine=l; break; }
+    if (board[l[0]] && board[l[0]]===board[l[1]] && board[l[0]]===board[l[2]]) {
+      winner=myRole; winLine=l; break;
+    }
   }
   if (!winner && board.every(v=>v)) winner='draw';
   if (winner) {
     status='done';
     const sc = (await get(ref(db,'rooms/'+roomCode+'/scores'))).val()||{X:0,O:0};
     if (winner!=='draw') sc[myRole]++;
-    await update(ref(db,'rooms/'+roomCode),{board,turn:myRole==='X'?'O':'X',status,winner,winLine:winLine||null,scores:sc,rematchX:false,rematchO:false});
+    await update(ref(db,'rooms/'+roomCode), {
+      board, turn: myRole==='X'?'O':'X',
+      status, winner, winLine: winLine||null,
+      scores: sc, rematchX:false, rematchO:false
+    });
   } else {
-    await update(ref(db,'rooms/'+roomCode),{board,turn:myRole==='X'?'O':'X'});
+    await update(ref(db,'rooms/'+roomCode), { board, turn: myRole==='X'?'O':'X' });
   }
 }
 
 async function requestRematch() {
-  await update(ref(db,'rooms/'+roomCode), myRole==='X'?{rematchX:true}:{rematchO:true});
+  await update(ref(db,'rooms/'+roomCode), myRole==='X' ? {rematchX:true} : {rematchO:true});
 }
 
 function doLeave(clean=true) {
   if (unsub) { unsub(); unsub=null; }
   if (clean && roomCode) {
     if (myRole==='X') remove(ref(db,'rooms/'+roomCode));
-    else update(ref(db,'rooms/'+roomCode),{playerO:'',status:'waiting',rematchO:false});
+    else update(ref(db,'rooms/'+roomCode), { playerO:'', status:'waiting', rematchO:false });
   }
   myName=''; myRole=''; roomCode='';
   document.getElementById('input-name').value='';
@@ -334,8 +369,8 @@ function doLeave(clean=true) {
 
 document.getElementById('btn-create').onclick = createRoom;
 document.getElementById('btn-join').onclick = joinRoom;
-document.getElementById('btn-cancel').onclick = ()=>doLeave(true);
-document.getElementById('btn-leave').onclick = ()=>doLeave(true);
+document.getElementById('btn-cancel').onclick = () => doLeave(true);
+document.getElementById('btn-leave').onclick = () => doLeave(true);
 document.getElementById('btn-rematch').onclick = requestRematch;
 </script>
 </body>
